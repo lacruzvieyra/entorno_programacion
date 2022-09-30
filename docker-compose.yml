@@ -1,0 +1,33 @@
+version: '3.4'
+
+networks:
+    redapiautor:
+
+services:
+  apiappdb:
+    container_name: app-db
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    ports:
+        - 8003:1433
+    environment:
+        - ACCEPT_EULA=Y
+        - SA_PASSWORD=Passw0rd
+    networks:
+        - redapiautor
+  apidesplieguecontenedorautor:
+    container_name: api-autor
+    image: ${DOCKER_REGISTRY-}apidesplieguecontenedorautor
+    build:
+      context: .
+      dockerfile: ApiDespliegueContenedorAutor/Dockerfile
+    ports:
+        - 8001:80
+        - 8002:443
+    depends_on:
+        - apiappdb
+    environment:
+        - DB_HOST=apiappdb
+        - DB_NAME=ApidespliegueAutor
+        - BD_SA_PASSWORD=Passw0rd
+    networks:
+        - redapiautor
